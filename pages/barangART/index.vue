@@ -58,10 +58,10 @@ definePageMeta({
             <Sidebar />
             <div class="content mb-5">
                 <div class="row mt-5 p-0 title-search">
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h3 class="mt-4">Barang ART</h3>
                     </div>
-                    <div class="col-md-6 mt-4 d-flex justify-content-end">
+                    <div class="col-6 col-md-6 mt-4 d-flex justify-content-end">
                         <nuxt-link to="/barangART/add">
                             <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ART</button>
                         </nuxt-link>
@@ -196,7 +196,7 @@ img {
     }
 
     th, td {
-        font-size: 0.6rem;
+        font-size: 0.5rem;
     }
 
     .search {
@@ -237,6 +237,11 @@ img {
 
     table i {
         font-size: 0.5rem;
+    }
+
+    img {
+        width: 2rem;
+
     }
 
 }

@@ -1,11 +1,12 @@
 <script setup>
 const supabase = useSupabaseClient()
 const categories = ref([])
+const barang = ref([])
 const pengambil = ref([])
 const keyword = ref('')
 
 const getRiwayat = async () => {
-  const { data, error } = await supabase.from('riwayat').select(`*, kategori(*)`)
+  const { data, error } = await supabase.from('riwayat').select(`*, barang(*), kategori(*)`)
   .ilike('nama_pengambil', `%${keyword.value}%`).order("created_at", { ascending: false });
 
   if (data) {
@@ -18,6 +19,11 @@ const getCategory = async () => {
     if (data) categories.value = data
 }
 
+const getBarang = async () => {
+    const { data, error } = await supabase.from('barang').select('*')
+    if (data) barang.value = data
+}
+
 const pengambilFiltered = computed(() => {
     return pengambil.value?.filter((b) => {
         return (
@@ -27,9 +33,87 @@ const pengambilFiltered = computed(() => {
     })
 })
 
+
+const getFormattedTodayDate = () => {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+
+const printTable = () => {
+//   const navbar = document.getElementById('navbar').outerHTML; // Ambil isi navbar
+  const printContents = document.getElementById('printableArea').innerHTML; // Ambil isi tabel
+  const formattedDate = getFormattedTodayDate();
+  const tandaTangan = `
+    <h6 class="text-end mt-5">Tasikmalaya, ${formattedDate}</h6>
+    <h6 class="text-end mt-5">............................................</h6>
+  `;
+  const originalContents = document.body.innerHTML;
+
+  document.body.innerHTML = `
+    <html>
+      <head>
+        <title>-</title>
+        <style>
+            h4, h5, p, .btn, .nav-link {
+                font-family: "Josefin Sans", serif;
+            }
+
+            .logo {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            .tohome {
+                color: #000000 !important;
+                text-decoration: none;
+            }
+
+            .text {
+                margin-left: 1rem;
+            }
+
+            table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                text-align: center;
+            }
+        </style>
+      </head>
+      <body>
+        <header>
+            <nav class="navbar navbar-expand-lg bg-light p-2" id="navbar">
+                <div class="container-fluid d-flex">
+                    <nuxt-link to="/dashboard" class="d-flex tohome">
+                        <img src="/assets/img/logo.png" alt="logo" class="logo mt-2">
+                        <div class="text mt-2">
+                            <h4 class="fw-medium">CABAPUS</h4>
+                            <p class="m-0">Catatan Barang Perpustakaan Universitas Siliwangi</p>
+                        </div>
+                    </nuxt-link>
+                </div>
+            </nav>
+        </header>
+        ${printContents}
+        ${tandaTangan}
+      </body>
+    </html>
+  `;
+
+  window.print();
+  document.body.innerHTML = originalContents; 
+
+  window.location.reload();
+};
+
+
 onMounted(() => {
     getRiwayat()
     getCategory()
+    getBarang()
 })
 
 
@@ -51,6 +135,7 @@ definePageMeta({
                     <div class="col-md-6 p-0">
                         <h3 class="mt-4">Riwayat Pengambilan Barang</h3>
                     </div>
+                    <button type="button" class="btn btn-print" @click="printTable">Print</button>
                     <div class="col-md-6 d-flex justify-content-end">
                         <div class="filter mt-3">
                             <form @submit.prevent="getRiwayat" class="d-flex gap-4">
@@ -61,7 +146,7 @@ definePageMeta({
                     </div>
                 </div>
                 <div class="card card-riwayat mt-4 shadow">
-                    <div class="table-responsive text-center mt-4">
+                    <div id="printableArea" class="table-responsive text-center mt-4">
                         <table class="mb-4">
                             <thead class="text-center">
                                 <tr>
@@ -78,7 +163,7 @@ definePageMeta({
                                     <td>{{ i + 1 }}</td>
                                     <td>{{ pengambil.tanggal }}</td>
                                     <td>{{ pengambil.nama_pengambil }}</td>
-                                    <td>{{ pengambil.nama_barang }}</td>
+                                    <td>{{ pengambil.barang?.nama_barang }}</td>
                                     <td>{{ pengambil.kategori?.nama }}</td>
                                     <td>{{ pengambil.jumlah_pengambilan }}</td>
                                 </tr>
@@ -99,7 +184,7 @@ h3,
 h6,
 th,
 td,
-input {
+input, .btn-print {
     font-family: "Josefin Sans", serif;
 }
 
@@ -138,6 +223,13 @@ th {
     margin-left: 20rem;
     flex-grow: 1;
     margin-top: 5rem;
+}
+
+.btn-print {
+    color: #fff;
+    width: 10rem;
+    height: 2.5rem;
+    background-color: #9AA6B2;
 }
 
 @media only screen and (max-width: 600px) {

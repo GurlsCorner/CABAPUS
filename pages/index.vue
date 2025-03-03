@@ -76,7 +76,7 @@ onMounted(() => {
         <h3>Statistik</h3>
         <div class="statistik">
             <div class="row card-statistik justify-content-center mt-5">
-                <div class="col-md-4">
+                <div class="col-6 col-md-4">
                     <div class="card shadow rounded-4">
                         <div class="text m-3">
                             <div class="d-flex">
@@ -90,7 +90,7 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-6 col-md-4">
                     <div class="card shadow rounded-4">
                         <div class="text m-3">
                             <div class="d-flex">
@@ -104,8 +104,8 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card shadow rounded-4">
+                <div class="col-6 col-md-4">
+                    <div class="card shadow rounded-4 third">
                         <div class="text m-3">
                             <div class="d-flex">
                                 <span class="span-first text-center rounded-4"><i
@@ -303,7 +303,7 @@ th {
     }
 
     th,
-    td {
+    td, .search, .date {
         font-size: 0.6rem;
     }
 

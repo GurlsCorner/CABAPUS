@@ -48,7 +48,7 @@
 <style scoped>
 .container-fluid {
   height: 100%;
-  width: 20rem; /* Pastikan sidebar punya lebar tetap */
+  width: 20rem; 
   flex-shrink: 0; /* Mencegah sidebar mengecil */
   position: fixed;
   top: 7rem;

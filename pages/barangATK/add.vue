@@ -1,5 +1,65 @@
 <script setup>
 const supabase = useSupabaseClient()
+const categories = ref([])
+const kategori = ref()
+const files = ref()
+const url_img = `https://ypbajejglnixqrikfvyp.supabase.co/storage/v1/object/public/fotoBarang`
+const form = ref({
+    nama_barang: "",
+    id_kategori: "",
+    id_ukuran: "",
+    jumlah: "",
+    foto_barang: null
+})
+
+const isLoading = ref(false)
+
+const getCategory = async () => {
+    const { data, error } = await supabase.from('kategori').select('*')
+    if (data) categories.value = data
+}
+
+
+async function saveToTable() {
+    let file = files.value[0]
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random()}.${fileExt}`
+    const filePath = `${kategori.value}/${fileName}`
+    isLoading.value = true
+
+    const { data, error } = await supabase.storage.from('fotoBarang').upload(filePath, file)
+    if (data) {
+        console.log("upload success")
+        const { data, error } = await supabase.from('barang')
+            .insert([{
+                nama_barang: form.value.nama_barang,
+                id_kategori: form.value.id_kategori,
+                jumlah: form.value.jumlah,
+                foto_barang: url_img + '/' + kategori.value + '/' + fileName
+            }])
+        if (error) throw error
+        if (data) {
+            console.log("succes: saved to table")
+        }
+    }
+    if (error) throw error
+    else {
+        isLoading.value = false;
+        navigateTo("/barangATK/") 
+    }
+}
+
+function disableInput(input) {
+  if (input.files.length > 0) {
+    input.disabled = true; // Menonaktifkan input setelah gambar dipilih
+  }
+}
+
+
+
+onMounted(() => {
+    getCategory()
+})
 
 
 definePageMeta({
@@ -17,16 +77,35 @@ definePageMeta({
             <Sidebar />
             <div class="content mb-5">
                 <h3>Tambah Barang ATK</h3>
-                <div class="row justify-content-center">
+                <div class="row justify-content-center m-0">
                     <div class="col-10 col-md-7">
                         <div class="card shadow rounded-4 m-5">
-                            <form class="m-5">
+                            <form @submit.prevent="saveToTable" class="m-5">
+                                <div class="mb-3">
+                                    <label class="form-label">Upload Gambar Disini</label>
+                                    <input type="file" id="imageInput" @change="(e) => files = e.target.files" accept="image/*">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label">Nama Barang</label>
-                                    <input type="text" class="form-control">
-                                </div>                                <div class="mb-3">
+                                    <input v-model="form.nama_barang" type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="kategori">Kategori File</label>
+                                    <select v-model="kategori" class="form-control form-select">
+                                        <option value="ATK">ATK</option>
+                                        <option value="ART">ART</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 kategori">
+                                    <label for="kategori">Kategori</label>
+                                    <select v-model="form.id_kategori" class="form-control form-select" id="kategori">
+                                        <option v-for="(category, i) in categories" :key="i" :value="category.id_kategori">{{
+                                            category.nama }}</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control"  aria-describedby="emailHelp">
+                                    <input v-model="form.jumlah" type="number" class="form-control"  aria-describedby="emailHelp">
                                 </div>
                                 <div class="add text-center mt-5">
                                     <button type="submit" class="btn rounded-5">Tambah</button>
@@ -110,7 +189,7 @@ h3 {
         height: 1.5rem;
     }
 
-    input {
+    input, .form-select {
         font-size: 0.7rem;
     }
 

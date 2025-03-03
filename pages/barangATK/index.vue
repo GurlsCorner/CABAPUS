@@ -2,17 +2,33 @@
 const supabase = useSupabaseClient()
 const barangATK = ref([])
 const keyword = ref('')
+const barang = ref()
+const selectBarang = ref({})
 const categories = ref([])
+const router = useRouter()
 
-
-const getBarang = async () => {
-  const { data, error } = await supabase.from('barang').select(`*, kategori(*)`)
-  .ilike('nama_barang', `%${keyword.value}%`).order("created_at", { ascending: false }).eq('id_kategori', 1);
-
-  if (data) {
-    barangATK.value = data
-    }
+const goToEdit = (barangID) => {
+    router.push(`/barangATK/${barangID}`)
 }
+
+function toggleDelete(barang) {
+    selectBarang.value = barang
+}
+
+const { data: barangs, refresh } = useLazyAsyncData('barangs', async () => {
+    const { data, error } = await supabase.from('barang').select(`*, kategori(*)`).order("created_at", { ascending: false })
+    if (error) throw error
+    return (data)
+})
+
+// const getBarang = async () => {
+//   const { data, error } = await supabase.from('barang').select(`*, kategori(*)`)
+//   .ilike('nama_barang', `%${keyword.value}%`).order("created_at", { ascending: false }).eq('id_kategori', 1);
+
+//   if (data) {
+//     barangATK.value = data
+//     }
+// }
 
 // const { data: barangATK, refresh } = useLazyAsyncData('barangATK', async () => {
 //     const { data, error } = await supabase
@@ -30,7 +46,7 @@ const getCategory = async () => {
 }
 
 const barangFiltered = computed(() => {
-    return barangATK.value?.filter((b) => {
+    return barangs.value?.filter((b) => {
         return (
             b.nama_barang?.toLowerCase().includes(keyword.value.toLowerCase()) || 
             b.created_at?.toLowerCase().includes(keyword.value.toLowerCase())
@@ -38,10 +54,17 @@ const barangFiltered = computed(() => {
     })
 })
 
+const deleteBarang = async (id) => {
+    const { error } = await supabase.from('barang').delete().eq('id', id)
+    if (error) throw error
+    else
+        refresh()
+}
+
 
 onMounted(() => {
     getCategory()
-    getBarang()
+    refresh()
 })
 
 
@@ -97,8 +120,11 @@ definePageMeta({
                                     <td>{{ barang.nama_barang }}</td>
                                     <td>{{ barang.kategori?.nama }}</td>
                                     <td>{{ barang.jumlah }}</td>
-                                    <td class="edit"><i class="bi bi-pencil-square"></i></td>
-                                    <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
+                                    <td class="edit">
+                                            <i class="bi bi-pencil-square" @click="goToEdit(barang.id)"></i>
+                                    </td>
+                                    <td class="delete text-danger"><i class="bi bi-trash3 text-danger"data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" @click="toggleDelete(barang)"></i></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -106,6 +132,28 @@ definePageMeta({
                 </div>
             </div>
         </div>
+
+        <!--Modal Delete-->
+        <div class="modal fade center" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md p-4 rounded-5">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title fs-5" id="exampleModalLabel"></div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h5>Apakah anda yakin akan menghapus barang ini? {{ selectBarang.nama_barang }}</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn edit rounded-5" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn delete rounded-5" data-bs-dismiss="modal"
+                            @click="deleteBarang(selectBarang.id)">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template> 
 
@@ -173,6 +221,7 @@ img {
 .edit, .delete {
     width: 4rem;
 }
+
 th, td {
     border: 0.5px solid #000;
 
@@ -195,7 +244,7 @@ th, td {
     }
 
     th, td {
-        font-size: 0.6rem;
+        font-size: 0.5rem;
     }
 
     .search {
@@ -236,6 +285,11 @@ th, td {
 
     table i {
         font-size: 0.5rem;
+    }
+
+    img {
+        width: 2rem;
+
     }
 
 }

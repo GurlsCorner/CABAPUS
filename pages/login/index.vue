@@ -30,12 +30,12 @@ definePageMeta ({
       <div class="row">
         <div class="col">
           <div class="card card-back mt-3 rounded-4">
+            <nuxt-link to="/" class="no-underline">
             <div class="d-flex m-2">
               <span class="span-first text-center rounded-3"><i class="bi bi-arrow-bar-left fs-4"></i></span>
-              <nuxt-link to="/" class="no-underline">
                 <h6 class="mt-2">Kembali</h6>
-              </nuxt-link>
-            </div>
+              </div>
+            </nuxt-link>
           </div>
         </div>
       </div>
@@ -176,7 +176,7 @@ h6 {
 
   .card-back {
     width: 5rem;
-    height: 2rem;
+    height: 2.3rem;
     margin-left: 0.5rem;
   }
 

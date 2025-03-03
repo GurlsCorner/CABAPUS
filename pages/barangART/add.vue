@@ -19,11 +19,42 @@ definePageMeta({
                 <div class="row justify-content-center">
                     <div class="col-10 col-md-7">
                         <div class="card shadow rounded-4 m-5">
-                            <form class="m-5">
+                            <!-- <form class="m-5">
                                 <div class="mb-3">
                                     <label class="form-label">Nama Barang</label>
                                     <input type="text" class="form-control">
                                 </div>                                <div class="mb-3">
+                                    <label class="form-label">Jumlah</label>
+                                    <input type="number" class="form-control"  aria-describedby="emailHelp">
+                                </div>
+                                <div class="add text-center mt-5">
+                                    <button type="submit" class="btn rounded-5">Tambah</button>
+                                </div>
+                            </form> -->
+                            <form class="m-5">
+                                <!-- <div class="mb-3">
+                                    <label class="form-label">Upload Gambar Disini</label>
+                                    <input type="file" accept="image/*">
+                                </div> -->
+                                <div class="mb-3">
+                                    <label class="form-label">Nama Barang</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="kategori">Kategori File</label>
+                                    <select class="form-control form-select">
+                                        <option value="ATK">ATK</option>
+                                        <option value="ART">ART</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 kategori">
+                                    <label for="kategori">Kategori</label>
+                                    <select class="form-control form-select" id="kategori">
+                                        <option value="ATK">ATK</option>
+                                        <option value="ART">ART</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
                                     <input type="number" class="form-control"  aria-describedby="emailHelp">
                                 </div>

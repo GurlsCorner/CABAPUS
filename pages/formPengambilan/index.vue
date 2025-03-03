@@ -2,76 +2,117 @@
 const supabase = useSupabaseClient()
 const categories = ref([])
 const isLoading = ref(false)
-const form = ref({
-    nama_pengambil: "",
-    nama_barang: "",
-    id_kategori: "",
-    jumlah_pengambilan: 0,
-})
+const searchQuery = ref('');
+const filteredItems = ref([]);
+const selectedItem = ref(null);
+const formData = ref({
+    nama_pengambil: '',
+    jumlah_pengambilan: 1,
+});
+// const form = ref({
+//     nama_pengambil: "",
+//     nama_barang: "",
+//     id_kategori: "",
+//     jumlah_pengambilan: 0,
+// })
 
-const getCategory = async () => {
-    const { data, error } = await supabase.from('kategori').select('*');
+// const getCategory = async () => {
+//     const { data, error } = await supabase.from('kategori').select('*');
     
-    if (error) {
-        console.error("❌ Error mengambil kategori:", error);
+//     if (error) {
+//         console.error("❌ Error mengambil kategori:", error);
+//     } else {
+//         console.log("✅ Kategori berhasil diambil:", data); // Debugging
+//         categories.value = data;
+//     }
+// };
+
+
+// Ambil barang dari Supabase berdasarkan kata kunci
+const fetchBarang = async () => {
+    if (!searchQuery.value || searchQuery.value.length === 0) {
+        filteredItems.value = [];
+        return;
+    }
+
+    const { data, error } = await supabase
+        .from('barang')
+        .select(`*, kategori(*)`)
+        .ilike('nama_barang', `%${searchQuery.value}%`)
+        .order('nama_barang', { ascending: true });
+
+    if (!error) {
+        console.log("✅ Data barang berhasil diambil:", data); // Debugging
+        filteredItems.value = data;
     } else {
-        console.log("✅ Kategori berhasil diambil:", data); // Debugging
-        categories.value = data;
+        console.error("❌ Error saat fetch barang:", error);
     }
 };
 
-async function saveToTable() {
-    // console.log("🔍 Selected id_kategori:", form.value.id_kategori); // Cek nilai sebelum insert
 
-    // if (!form.value.id_kategori) {
-    //     alert("⚠️ Pilih kategori terlebih dahulu!");
-    //     return;
-    // }
 
-    // try {
-    //     const { data, error } = await supabase.from('riwayat')
-    //         .insert([{
-    //             nama_pengambil: form.value.nama_pengambil,
-    //             nama_barang: form.value.nama_barang,
-    //             id_kategori: Number(form.value.id_kategori),                
-    //             jumlah_pengambilan: form.value.jumlah_pengambilan,
-    //         }]);
+// Pantau perubahan input
+watch(searchQuery, fetchBarang);
 
-    //     if (error) throw error;
+// Pilih barang dari dropdown
+const selectBarang = (barang) => {
+    if (!barang) return;
+    console.log('Barang dipilih:', barang); // Debugging
 
-    //     console.log("✅ Success: Data saved", data);
-    //     navigateTo("/dashboard/");
-    // } catch (err) {
-    //     console.error("❌ Error saving data:", err.message);
-    //     alert("Gagal menyimpan data: " + err.message);
-    // }
+    selectedItem.value = { 
+        id: barang.id, 
+        id_barang: barang.id, 
+        id_kategori: barang.id_kategori || barang.kategori?.id, // Pastikan ambil ID kategori
+    };
 
-        const idKategori = parseInt(form.value.id_kategori, 10);
-        const { data, error } = await supabase.from('riwayat')
-            .insert([{
-                nama_pengambil: form.value.nama_pengambil,
-                nama_barang: form.value.nama_barang,
-                id_kategori: idKategori,
-                jumlah_pengambilan: form.value.jumlah_pengambilan,
-            }])
-        if (error) throw error
-        if (data) {
-            console.log("succes: saved to table")
-        }
-    if (error) throw error
-    else {
-        isLoading.value = false;
-        navigateTo("/dashboard/") 
+    searchQuery.value = barang.barang?.id; // Masukkan ke input
+    filteredItems.value = []; // Sembunyikan daftar
+};
+
+
+// Kirim data ke Supabase
+const submitForm = async () => {
+    if (!selectedItem.value || !formData.value.nama_pengambil || formData.value.jumlah_pengambilan <= 0) {
+        console.error("⚠️ Data tidak lengkap!", { selectedItem: selectedItem.value, formData: formData.value });
+        return;
     }
-}
+
+    const { error } = await supabase.from('riwayat').insert([
+        {
+            id_barang: selectedItem.value.id_barang, // Harus pakai ID barang yang benar
+            nama_pengambil: formData.value.nama_pengambil,
+            id_kategori: selectedItem.value.id_kategori,
+            jumlah_pengambilan: formData.value.jumlah_pengambilan,
+        },
+    ]);
+
+    if (error) {
+        console.error("❌ Error saat insert ke Supabase:", error);
+        return;
+    }
+
+    if(!error) navigateTo('/riwayat')
+
+    // console.log("✅ Data berhasil dikirim!");
+    // alert('Data berhasil dikirim');
+    
+    // Reset form
+    searchQuery.value = '';
+    selectedItem.value = null;
+    formData.value = { nama_pengambil: '', jumlah_pengambilan: 1 };
+};
+
+
+
+
 
 // watch(() => form.value.id_kategori, (newVal) => {
 //     console.log("🔍 id_kategori berubah:", newVal);
 // });
 
-onMounted(() => {
-    getCategory()
-})
+// onMounted(() => {
+//     getCategory()
+// })
 
 
 definePageMeta({
@@ -90,17 +131,27 @@ definePageMeta({
                 <div class="row justify-content-center">
                     <div class="col-10 col-md-7">
                         <div class="card shadow rounded-4 m-5">
-                            <form @submit.prevent="saveToTable" class="m-5">
+                            <form @submit.prevent="submitForm" class="m-5">
                                 <div class="mb-3">
                                     <label class="form-label">Nama Pengambil</label>
-                                    <input v-model="form.nama_pengambil" type="text" class="form-control">
+                                    <input v-model="formData.nama_pengambil" type="text" class="form-control">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Nama Barang</label>
-                                    <input v-model="form.nama_barang" type="text" class="form-control">
+                                    <input v-model="searchQuery" type="text" class="form-control">
+                                    <!-- Dropdown Hasil Pencarian -->
+                                    <ul v-if="filteredItems.length">
+                                        <li v-for="barang in filteredItems" :key="barang.id" @click="selectBarang(barang)">
+                                            {{ barang.nama_barang }}
+                                        </li>
+                                    </ul>
                                 </div>
-                                
-                                <div class="mb-3">
+
+                                <!-- Menampilkan Barang yang Dipilih -->
+                                <!-- <p v-if="selectedItem?.nama_barang">Barang Dipilih: {{ selectedItem?.nama_barang }}</p> -->
+
+
+                                <!-- <div class="mb-3">
                                     <label class="form-label">Jenis Barang</label>
                                     <div class="d-flex gap-5">
                                         <div v-for="category in categories" :key="category.id">
@@ -114,11 +165,11 @@ definePageMeta({
                                             <label :for="'category-' + category.id">{{ category.nama }}</label>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <!-- <p>🔍 Selected id_kategori: {{ form.id_kategori }}</p> -->
                                 <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
-                                    <input v-model="form.jumlah_pengambilan" type="number" class="form-control"  aria-describedby="emailHelp">
+                                    <input v-model="formData.jumlah_pengambilan" type="number" class="form-control"  aria-describedby="emailHelp">
                                 </div>
                                 <div class="submit text-center mt-5">
                                     <button type="submit" class="btn rounded-5">Kirim</button>
@@ -163,6 +214,10 @@ h3 {
     margin-left: 20rem;
     flex-grow: 1;
     margin-top: 5rem;
+}
+
+ul{
+    list-style: none;
 }
 
 @media only screen and (max-width: 600px) {
