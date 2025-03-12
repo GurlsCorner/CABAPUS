@@ -16,7 +16,7 @@ const setActive = (tab) => {
 
 
 <template>
-  <nav v-if="route?.name != 'login'" class="navbar navbar-expand-lg bg-light p-3 shadow fixed-top">
+  <nav v-if="route?.name != 'login'" class="navbar navbar-expand-lg bg-light p-2 shadow fixed-top">
     <div class="container-fluid d-flex">
       <nuxt-link to="/" class="d-flex tohome">
           <img src="../assets/img/logo.png" alt="logo" class="logo mt-2">

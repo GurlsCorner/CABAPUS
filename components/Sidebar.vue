@@ -1,13 +1,29 @@
 <template>
     <div class="container-fluid shadow">
         <div class="menu">
-            <div class="card m-2 mt-3 rounded-4">
+            <div class="card m-2 rounded-4">
               <nuxt-link to="/dashboard" class="no-underline">
               <div class="d-flex m-3">
                 <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-house-door"></i></span>
                   <h6 class="mt-3">Dashboard</h6>
                 </div>
               </nuxt-link>
+            </div>
+            <div class="card m-2 mt-4 rounded-4">
+              <nuxt-link to="/barangATK" class="no-underline">
+              <div class="d-flex m-3">
+                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-folder-fill"></i></span> 
+                  <h6 class="mt-3">Barang ATK</h6>
+                </div>
+              </nuxt-link>          
+            </div>
+            <div class="card m-2 mt-4 rounded-4">
+              <nuxt-link to="/barangART" class="no-underline">
+              <div class="d-flex m-3">
+                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-scissors"></i></span>  
+                  <h6 class="mt-3">Barang ART</h6>
+                </div>
+              </nuxt-link>        
             </div>
             <div class="card m-2 mt-4 rounded-4">
               <nuxt-link to="/formPengambilan" class="no-underline">
@@ -24,22 +40,6 @@
                   <h6 class="mt-2">Riwayat Pengambilan</h6>
                 </div>
               </nuxt-link>
-              </div>
-            <div class="card m-2 mt-4 rounded-4">
-              <nuxt-link to="/barangATK" class="no-underline">
-              <div class="d-flex m-3">
-                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-folder-fill"></i></span> 
-                  <h6 class="mt-3">Barang ATK</h6>
-                </div>
-              </nuxt-link>          
-            </div>
-            <div class="card m-2 mt-4 mb-5 rounded-4">
-              <nuxt-link to="/barangART" class="no-underline">
-              <div class="d-flex m-3">
-                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-scissors"></i></span>  
-                  <h6 class="mt-3">Barang ART</h6>
-                </div>
-              </nuxt-link>        
               </div>
         </div>
     </div>

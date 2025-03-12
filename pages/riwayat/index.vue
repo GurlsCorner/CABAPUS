@@ -56,24 +56,10 @@ const printTable = () => {
   document.body.innerHTML = `
     <html>
       <head>
-        <title>-</title>
+        <title>Print</title>
         <style>
-            h4, h5, p, .btn, .nav-link {
+            h4 {
                 font-family: "Josefin Sans", serif;
-            }
-
-            .logo {
-                width: 4rem;
-                height: 4rem;
-            }
-
-            .tohome {
-                color: #000000 !important;
-                text-decoration: none;
-            }
-
-            .text {
-                margin-left: 1rem;
             }
 
             table, th, td {
@@ -85,17 +71,7 @@ const printTable = () => {
       </head>
       <body>
         <header>
-            <nav class="navbar navbar-expand-lg bg-light p-2" id="navbar">
-                <div class="container-fluid d-flex">
-                    <nuxt-link to="/dashboard" class="d-flex tohome">
-                        <img src="/assets/img/logo.png" alt="logo" class="logo mt-2">
-                        <div class="text mt-2">
-                            <h4 class="fw-medium">CABAPUS</h4>
-                            <p class="m-0">Catatan Barang Perpustakaan Universitas Siliwangi</p>
-                        </div>
-                    </nuxt-link>
-                </div>
-            </nav>
+            <h4 class="text-center mt-2 mb-4">Riwayat Pengambilan Barang</h4>
         </header>
         ${printContents}
         ${tandaTangan}
@@ -131,18 +107,18 @@ definePageMeta({
         <div class="page d-flex">
             <Sidebar />
             <div class="content mb-5">
-                <div class="row mt-5 title-search">
-                    <div class="col-md-6 p-0">
-                        <h3 class="mt-4">Riwayat Pengambilan Barang</h3>
-                    </div>
-                    <button type="button" class="btn btn-print" @click="printTable">Print</button>
-                    <div class="col-md-6 d-flex justify-content-end">
-                        <div class="filter mt-3">
+                <h3 class="mt-5">Riwayat Pengambilan Barang</h3>
+                <div class="row mt-5 title-search d-flex justify-content-end">
+                    <div class="col-md-6 justify-content-end">
+                        <div class="filter">
                             <form @submit.prevent="getRiwayat" class="d-flex gap-4">
                                 <input v-model="keyword" type="text" placeholder="Searh..." class="search rounded-5">
                                 <input v-model="keyword" type="date" class="date rounded-5">
                             </form>
                         </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-print rounded-5" @click="printTable">Print</button>
                     </div>
                 </div>
                 <div class="card card-riwayat mt-4 shadow">
@@ -230,6 +206,11 @@ th {
     width: 10rem;
     height: 2.5rem;
     background-color: #9AA6B2;
+}
+
+.btn {
+    border: 0.5px solid #000;
+
 }
 
 @media only screen and (max-width: 600px) {

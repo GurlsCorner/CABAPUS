@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg bg-light p-2 shadow fixed-top">
     <div class="container-fluid d-flex">
       <nuxt-link to="/dashboard" class="d-flex tohome">
-          <img src="../assets/img/logo.png" alt="logo" class="logo mt-2">
+          <img src="../assets/img/logo.png" alt="logo" class="logo">
           <div class="text mt-2">
             <h4 class="fw-medium">CABAPUS</h4>
             <p class="m-0">Catatan Barang Perpustakaan Universitas Siliwangi</p>

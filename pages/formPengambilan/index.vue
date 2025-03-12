@@ -18,7 +18,7 @@ const formData = ref({
 
 // const getCategory = async () => {
 //     const { data, error } = await supabase.from('kategori').select('*');
-    
+
 //     if (error) {
 //         console.error("❌ Error mengambil kategori:", error);
 //     } else {
@@ -57,18 +57,19 @@ watch(searchQuery, fetchBarang);
 // Pilih barang dari dropdown
 const selectBarang = (barang) => {
     if (!barang) return;
+    
     console.log('Barang dipilih:', barang); // Debugging
 
     selectedItem.value = { 
         id: barang.id, 
         id_barang: barang.id, 
         id_kategori: barang.id_kategori || barang.kategori?.id, // Pastikan ambil ID kategori
+        nama_barang: barang.nama_barang
     };
 
-    searchQuery.value = barang.barang?.id; // Masukkan ke input
-    filteredItems.value = []; // Sembunyikan daftar
+    searchQuery.value = barang.nama_barang; // Masukkan nama barang ke input
+    filteredItems.value = []; // Kosongkan dropdown setelah memilih barang
 };
-
 
 // Kirim data ke Supabase
 const submitForm = async () => {
@@ -91,11 +92,11 @@ const submitForm = async () => {
         return;
     }
 
-    if(!error) navigateTo('/riwayat')
+    if (!error) navigateTo('/riwayat')
 
     // console.log("✅ Data berhasil dikirim!");
     // alert('Data berhasil dikirim');
-    
+
     // Reset form
     searchQuery.value = '';
     selectedItem.value = null;
@@ -138,15 +139,17 @@ definePageMeta({
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Nama Barang</label>
-                                    <input v-model="searchQuery" type="text" class="form-control">
+                                    <input v-model="searchQuery" type="text" class="form-control" @focus="fetchBarang"
+                                        @input="fetchBarang">
                                     <!-- Dropdown Hasil Pencarian -->
-                                    <ul v-if="filteredItems.length">
-                                        <li v-for="barang in filteredItems" :key="barang.id" @click="selectBarang(barang)">
+                                    <ul v-if="filteredItems.length > 0 && searchQuery !== selectedItem?.nama_barang"
+                                        class="dropdown">
+                                        <li v-for="barang in filteredItems" :key="barang.id"
+                                            @click="selectBarang(barang)">
                                             {{ barang.nama_barang }}
                                         </li>
                                     </ul>
                                 </div>
-
                                 <!-- Menampilkan Barang yang Dipilih -->
                                 <!-- <p v-if="selectedItem?.nama_barang">Barang Dipilih: {{ selectedItem?.nama_barang }}</p> -->
 
@@ -169,7 +172,8 @@ definePageMeta({
                                 <!-- <p>🔍 Selected id_kategori: {{ form.id_kategori }}</p> -->
                                 <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
-                                    <input v-model="formData.jumlah_pengambilan" type="number" class="form-control"  aria-describedby="emailHelp">
+                                    <input v-model="formData.jumlah_pengambilan" type="number" class="form-control"
+                                        aria-describedby="emailHelp">
                                 </div>
                                 <div class="submit text-center mt-5">
                                     <button type="submit" class="btn rounded-5">Kirim</button>
@@ -177,16 +181,19 @@ definePageMeta({
                             </form>
                         </div>
                     </div>
-                </div>        
+                </div>
             </div>
         </div>
     </div>
-</template> 
+</template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 
-h3, label, input, .btn {
+h3,
+label,
+input,
+.btn {
     font-family: "Josefin Sans", serif;
 }
 
@@ -216,7 +223,7 @@ h3 {
     margin-top: 5rem;
 }
 
-ul{
+ul {
     list-style: none;
 }
 
@@ -305,7 +312,6 @@ ul{
     }
 
 }
-
 </style>
 
 

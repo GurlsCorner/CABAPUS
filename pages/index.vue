@@ -1,6 +1,7 @@
 <script setup>
 const supabase = useSupabaseClient()
 const categories = ref([])
+const barang = ref([])
 const pengambil = ref([])
 const keyword = ref('')
 const jmlATK = ref()
@@ -39,11 +40,11 @@ const getjmlART = async () => {
 }
 
 const getRiwayat = async () => {
-    const { data, error } = await supabase.from('riwayat').select(`*, kategori(*)`)
-        .ilike('nama_pengambil', `%${keyword.value}%`).order("created_at", { ascending: false });
+  const { data, error } = await supabase.from('riwayat').select(`*, barang(*), kategori(*)`)
+  .ilike('nama_pengambil', `%${keyword.value}%`).order("created_at", { ascending: false });
 
-    if (data) {
-        pengambil.value = data
+  if (data) {
+    pengambil.value = data
     }
 }
 
@@ -51,6 +52,12 @@ const getCategory = async () => {
     const { data, error } = await supabase.from('kategori').select('*')
     if (data) categories.value = data
 }
+
+const getBarang = async () => {
+    const { data, error } = await supabase.from('barang').select('*')
+    if (data) barang.value = data
+}
+
 
 const pengambilFiltered = computed(() => {
     return pengambil.value?.filter((b) => {
@@ -67,6 +74,7 @@ onMounted(() => {
     getjmlATK()
     getRiwayat()
     getCategory()
+    getBarang()
 })
 </script>
 
@@ -75,7 +83,7 @@ onMounted(() => {
     <div class="container-fluid mb-5">
         <h3>Statistik</h3>
         <div class="statistik">
-            <div class="row card-statistik justify-content-center mt-5">
+            <div class="row card-statistik justify-content-center mt-5 m-3">
                 <div class="col-6 col-md-4">
                     <div class="card shadow rounded-4">
                         <div class="text m-3">
@@ -151,7 +159,7 @@ onMounted(() => {
                             <td>{{ i + 1 }}</td>
                             <td>{{ pengambil.tanggal }}</td>
                             <td>{{ pengambil.nama_pengambil }}</td>
-                            <td>{{ pengambil.nama_barang }}</td>
+                            <td>{{ pengambil.barang?.nama_barang }}</td>
                             <td>{{ pengambil.kategori?.nama }}</td>
                             <td>{{ pengambil.jumlah_pengambilan }}</td>
                         </tr>
@@ -252,7 +260,7 @@ th {
 @media only screen and (max-width: 600px) {
     h3 {
         margin-left: 1rem;
-        margin-top: 5rem;
+        margin-top: -3rem;
         font-size: 1rem;
     }
 

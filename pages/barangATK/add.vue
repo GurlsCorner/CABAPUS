@@ -6,8 +6,7 @@ const files = ref()
 const url_img = `https://ypbajejglnixqrikfvyp.supabase.co/storage/v1/object/public/fotoBarang`
 const form = ref({
     nama_barang: "",
-    id_kategori: "",
-    id_ukuran: "",
+    id_kategori: "1",
     jumlah: "",
     foto_barang: null
 })
@@ -24,7 +23,7 @@ async function saveToTable() {
     let file = files.value[0]
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random()}.${fileExt}`
-    const filePath = `${kategori.value}/${fileName}`
+    const filePath = `ATK/${fileName}`
     isLoading.value = true
 
     const { data, error } = await supabase.storage.from('fotoBarang').upload(filePath, file)
@@ -33,9 +32,9 @@ async function saveToTable() {
         const { data, error } = await supabase.from('barang')
             .insert([{
                 nama_barang: form.value.nama_barang,
-                id_kategori: form.value.id_kategori,
+                id_kategori: "1",
                 jumlah: form.value.jumlah,
-                foto_barang: url_img + '/' + kategori.value + '/' + fileName
+                foto_barang: url_img + '/' + filePath
             }])
         if (error) throw error
         if (data) {
@@ -89,7 +88,7 @@ definePageMeta({
                                     <label class="form-label">Nama Barang</label>
                                     <input v-model="form.nama_barang" type="text" class="form-control">
                                 </div>
-                                <div class="mb-3">
+                                <!-- <div class="mb-3">
                                     <label for="kategori">Kategori File</label>
                                     <select v-model="kategori" class="form-control form-select">
                                         <option value="ATK">ATK</option>
@@ -102,7 +101,7 @@ definePageMeta({
                                         <option v-for="(category, i) in categories" :key="i" :value="category.id_kategori">{{
                                             category.nama }}</option>
                                     </select>
-                                </div>
+                                </div> -->
                                 <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
                                     <input v-model="form.jumlah" type="number" class="form-control"  aria-describedby="emailHelp">

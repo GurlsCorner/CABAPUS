@@ -1,6 +1,7 @@
 <script setup>
 const supabase = useSupabaseClient()
 const categories = ref([])
+const barang = ref([])
 const pengambil = ref([])
 const keyword = ref('')
 const jmlATK = ref()
@@ -38,7 +39,7 @@ const getjmlART = async () => {
 }
 
 const getRiwayat = async () => {
-  const { data, error } = await supabase.from('riwayat').select(`*, kategori(*)`)
+  const { data, error } = await supabase.from('riwayat').select(`*, barang(*), kategori(*)`)
   .ilike('nama_pengambil', `%${keyword.value}%`).order("created_at", { ascending: false });
 
   if (data) {
@@ -49,6 +50,11 @@ const getRiwayat = async () => {
 const getCategory = async () => {
     const { data, error } = await supabase.from('kategori').select('*')
     if (data) categories.value = data
+}
+
+const getBarang = async () => {
+    const { data, error } = await supabase.from('barang').select('*')
+    if (data) barang.value = data
 }
 
 const pengambilFiltered = computed(() => {
@@ -66,6 +72,7 @@ onMounted(() => {
     getjmlATK()
     getRiwayat()
     getCategory()
+    getBarang()
 })
 
 
@@ -153,7 +160,7 @@ definePageMeta({
                                     <td>{{ i + 1 }}</td>
                                     <td>{{ pengambil.tanggal }}</td>
                                     <td>{{ pengambil.nama_pengambil }}</td>
-                                    <td>{{ pengambil.nama_barang }}</td>
+                                    <td>{{ pengambil.barang?.nama_barang }}</td>
                                     <td>{{ pengambil.kategori?.nama }}</td>
                                     <td>{{ pengambil.jumlah_pengambilan }}</td>
                                 </tr>
