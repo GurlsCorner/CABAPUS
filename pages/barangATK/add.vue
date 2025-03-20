@@ -1,13 +1,15 @@
 <script setup>
 const supabase = useSupabaseClient()
 const categories = ref([])
-const kategori = ref()
+const satuan = ref([])
 const files = ref()
 const url_img = `https://ypbajejglnixqrikfvyp.supabase.co/storage/v1/object/public/fotoBarang`
 const form = ref({
     nama_barang: "",
+    spek: "",
     id_kategori: "1",
     jumlah: "",
+    id_satuan: "",
     foto_barang: null
 })
 
@@ -16,6 +18,11 @@ const isLoading = ref(false)
 const getCategory = async () => {
     const { data, error } = await supabase.from('kategori').select('*')
     if (data) categories.value = data
+}
+
+const getSatuan = async () => {
+    const { data, error } = await supabase.from('satuan').select('*')
+    if (data) satuan.value = data
 }
 
 
@@ -32,8 +39,10 @@ async function saveToTable() {
         const { data, error } = await supabase.from('barang')
             .insert([{
                 nama_barang: form.value.nama_barang,
+                spek: form.value.spek,
                 id_kategori: "1",
                 jumlah: form.value.jumlah,
+                id_satuan: form.value.id_satuan,
                 foto_barang: url_img + '/' + filePath
             }])
         if (error) throw error
@@ -48,16 +57,9 @@ async function saveToTable() {
     }
 }
 
-function disableInput(input) {
-  if (input.files.length > 0) {
-    input.disabled = true; // Menonaktifkan input setelah gambar dipilih
-  }
-}
-
-
-
 onMounted(() => {
     getCategory()
+    getSatuan()
 })
 
 
@@ -88,23 +90,20 @@ definePageMeta({
                                     <label class="form-label">Nama Barang</label>
                                     <input v-model="form.nama_barang" type="text" class="form-control">
                                 </div>
-                                <!-- <div class="mb-3">
-                                    <label for="kategori">Kategori File</label>
-                                    <select v-model="kategori" class="form-control form-select">
-                                        <option value="ATK">ATK</option>
-                                        <option value="ART">ART</option>
-                                    </select>
+                                <div class="mb-3">
+                                    <label class="form-label">Spek</label>
+                                    <input v-model="form.spek" type="text" class="form-control">
                                 </div>
-                                <div class="mb-3 kategori">
-                                    <label for="kategori">Kategori</label>
-                                    <select v-model="form.id_kategori" class="form-control form-select" id="kategori">
-                                        <option v-for="(category, i) in categories" :key="i" :value="category.id_kategori">{{
-                                            category.nama }}</option>
-                                    </select>
-                                </div> -->
                                 <div class="mb-3">
                                     <label class="form-label">Jumlah</label>
                                     <input v-model="form.jumlah" type="number" class="form-control"  aria-describedby="emailHelp">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Satuan</label>
+                                    <select v-model="form.id_satuan" class="form-control form-select" id="keperluan">
+                                        <option v-for="(satu, i) in satuan" :key="i" :value="satu.id_satuan">{{ satu.nama }}
+                                        </option>
+                                    </select>
                                 </div>
                                 <div class="add text-center mt-5">
                                     <button type="submit" class="btn rounded-5">Tambah</button>
@@ -239,153 +238,3 @@ h3 {
 
 
 </style>
-
-
-<!-- <template>
-    <div class="container-fluid">
-        <div class="dashboard d-flex">
-            <Sidebar />
-            <div class="content mb-5">   
-                <h3>Tambah Barang ATK</h3>
-                <div class="row justify-content-center">
-                    <div class="col-10">
-                        <div class="card shadow rounded-4 m-5">
-                            <form class="m-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Nama Barang</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control"  aria-describedby="emailHelp">
-                                </div>
-                                <div class="text-center mt-5">
-                                    <button type="submit" class="btn rounded-5">Kirim</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-             </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h3, label, .btn {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-    margin-top: 4rem;
-}
-
-.card {
-    width: 80%;
-    margin: auto;
-}
-
-.btn {
-    width: 15rem;
-    color: #fff;
-    background-color: #9AA6B2;
-}
-
-.content {
-    margin-left: 20rem;
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-@media only screen and (max-width: 600px) {
-    h3 {
-        margin-left: 1.5rem;
-        margin-top: 5rem;
-    }
-
-    .content {
-        margin-left: 7rem;
-        margin-top: 3rem;
-    }
-
-    .card {
-        width: 100%;
-        margin: 2rem 0 !important;
-    }
-
-    .btn {
-        width: 10rem;
-    }
-
-    form {
-        margin: 2.5rem !important;
-    }
-}
-
-</style> -->
-
-
-
-<!-- <template>
-    <div class="container-fluid mb-5">
-        <div class="page d-flex">
-                <Sidebar />
-            <div class="content mb-5">
-                <h3>Tambah Barang ATK</h3>
-                <div class="row justify-content-center">
-                    <div class="col-10">
-                        <div class="card shadow rounded-4 m-5">
-                            <form class="m-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Nama Barang</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control"  aria-describedby="emailHelp">
-                                </div>
-                                <div class="text-center mt-5">
-                                    <button type="submit" class="btn rounded-5">Kirim</button>
-                                </div>
-                            </form> 
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h3, label, input, .btn {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-    margin-top: 4rem;
-}
-
-.card {
-    width: 80%;
-    margin: auto;
-}
-
-.btn {
-    width: 15rem;
-    color: #fff;
-    background-color: #9AA6B2;
-}
-
-.content {
-    margin-left: 20rem; /* Offset the main content to the right of the sidebar */
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-</style> -->

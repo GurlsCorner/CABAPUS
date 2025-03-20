@@ -11,9 +11,9 @@ const totalHariIni = ref(0)
 const getHariIni = async () => {
     const today = new Date().toISOString().split('T')[0]
     const { count, error } = await supabase
-    .from('riwayat') // Ganti dengan nama tabel kamu
-    .select('*', { count: 'exact', head: true }) // Hanya hitung jumlah data
-    .gte('created_at', today) // Filter tanggal hari ini
+    .from('riwayat')
+    .select('*', { count: 'exact', head: true })
+    .gte('created_at', today)
 
   if (!error) {
     totalHariIni.value = count ?? 0
@@ -81,8 +81,6 @@ definePageMeta({
     middleware: 'auth'
 })
 
-
-
 </script>
 
 <template>
@@ -129,11 +127,9 @@ definePageMeta({
                         </div>
                     </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col-md-6">
-                        <h3 class="mt-4">Riwayat Pengambilan Barang</h3>
-                    </div>
-                    <div class="col-md-6 d-flex justify-content-end">
+                <div class="mt-5">
+                    <h3 class="mt-4">Riwayat Pengambilan Barang</h3>
+                    <div class="d-flex justify-content-end">
                         <div class="filter mt-3">
                             <form @submit.prevent="getRiwayat" class="d-flex gap-4">
                                 <input v-model="keyword" type="text" placeholder="Searh..." class="search rounded-5">
@@ -388,195 +384,3 @@ h6 {
 }
 
 </style>
-
-
-
-<!-- <template>
-    <div class="container-fluid">
-        <div class="dashboard d-flex">
-            <Sidebar />
-            <div class="content mb-5">
-                    <h3>Statistik</h3>
-                    <div class="row justify-content-center mt-4 m-5 statistik">
-                        <div class="col-6 col-md-4">
-                            <div class="card shadow rounded-4">
-                                <div class="text m-3">
-                                    <div class="d-flex">
-                                        <span class="span-first text-center rounded-4"><i class="bi bi-card-list fs-2 mt-2"></i></span>
-                                        <span class="ms-auto text-center rounded-4"><i class="bi bi-arrow-up-left fs-5 arrow"></i></span>
-                                    </div>
-                                    <h6 class="mt-5">Total Pengambilan Hari Ini</h6>
-                                    <h2>60</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4">
-                            <div class="card shadow rounded-4">
-                                <div class="text m-3">
-                                    <div class="d-flex">
-                                        <span class="span-first text-center rounded-4"><i class="bi bi-folder-fill fs-2 mt-2"></i></span>
-                                        <span class="ms-auto text-center rounded-4"><i class="bi bi-arrow-down-left fs-5 arrow"></i></span>
-                                    </div>
-                                    <h6 class="mt-5">Total Barang ATK</h6>
-                                    <h2>60</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4">
-                            <div class="card shadow rounded-4 third">
-                                <div class="text m-3">
-                                    <div class="d-flex">
-                                        <span class="span-first text-center rounded-4"><i class="bi bi-scissors fs-2 mt-2"></i></span>
-                                        <span class="ms-auto text-center rounded-4"><i class="bi bi-arrow-down-left fs-5 arrow"></i></span>
-                                    </div>
-                                    <h6 class="mt-5">Total Barang ART</h6>
-                                    <h2>60</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <h3 class="mt-5">Riwayat Pengambilan</h3>
-                    <div class="card card-riwayat mt-4 shadow">
-                        <div class="table-responsive text-center mt-4">
-                            <table class="mb-4">
-                                <thead class="text-center">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Tanggal</th>
-                                        <th>Nama Pengambil</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jenis Barang</th>
-                                        <th>Jumlah</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Indah</td>
-                                        <td>Tisu</td>
-                                        <td>ART</td>
-                                        <td>1</td>
-                                    </tr>
-                                </tbody>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>2</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Fani</td>
-                                        <td>Pulpen</td>
-                                        <td>ATK</td>
-                                        <td>1</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h2, h3, h6, th, td {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-    margin-top: 4rem;
-}
-
-.arrow {
-    color: green;
-}
-
-span {
-    width: 5rem;
-    height: 2rem;
-    border: none;
-    background-color: #EFFFE4;
-}
-
-.card-riwayat {
-    width: 90%;
-    margin: auto;
-}
-
-table {
-    width: 95%;
-    margin: auto;
-}
-
-.span-first {
-    background-color: #ffff !important;
-    border: 0.1px solid grey;
-    height: 3.4rem;
-    width: 4rem;
-}
-
-.span-first i {
-    color: grey;
-}
-
-th {
-    background-color: #BCCCDC;
-}
-
-.content {
-    margin-left: 20rem;
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-@media only screen and (max-width: 600px) {
-    h3 {
-        margin-left: 2rem;
-        margin-top: 5rem;
-    }
-
-    .content {
-        margin-left: 6rem;
-        margin-top: 3rem;
-    }
-
-    .statistik {
-        margin: 1rem !important;
-    }
-
-    h6 {
-        font-size: 0.7rem;
-        margin-top: 2rem !important;
-    }
-
-    h2 {
-        font-size: 1rem;
-    }
-
-    .third {
-        margin-top: 1.5rem;
-    }
-
-    .span-first {
-        height: 2.5rem;
-        width: 3rem;
-    }
-
-    .arrow {
-        font-size: 0.6rem !important;
-    }
-
-    span {
-        width: 2.5rem;
-        height: 1.7rem;
-    }
-
-    table {
-        margin: 0 1rem;
-    }
-
-}
-
-</style> -->

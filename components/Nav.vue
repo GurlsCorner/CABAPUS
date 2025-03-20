@@ -90,7 +90,7 @@ h5 {
     margin-top: 0.2rem;
   }
 
-  h5 {
+  h5, .dropdown-item {
     font-size: 0.7rem;
   }
 

@@ -12,8 +12,8 @@ const totalHariIni = ref(0)
 const getHariIni = async () => {
     const today = new Date().toISOString().split('T')[0]
     const { count, error } = await supabase
-    .from('riwayat') // Ganti dengan nama tabel kamu
-    .select('*', { count: 'exact', head: true }) // Hanya hitung jumlah data
+    .from('riwayat') 
+    .select('*', { count: 'exact', head: true }) 
     .gte('created_at', today) // Filter tanggal hari ini
 
   if (!error) {
@@ -169,19 +169,6 @@ onMounted(() => {
         </div>
     </div>
 </template>
-<!-- <script setup>
-const supabase = useSupabaseClient()
-
-const pengambilan = ref([])
-const barang = ref([])
-
-const getPengambilan = async () => {
-  const { data, error } = await supabase.from("pengambilan").select(`*,kategori(*)`).ilike("judul", `%${keyword.value}`)
-  if (data) {
-    books.value = data;
-  }
-};
-</script> -->
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');

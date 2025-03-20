@@ -81,7 +81,7 @@ definePageMeta ({
 .container-fluid {
     background: url("~/assets/img/background.jpg") no-repeat center center;
     background-size: cover;
-    height: 130vh; /* Full viewport height */
+    height: 130vh; 
 }
 
 
@@ -134,7 +134,7 @@ h6 {
 @media only screen and (max-width: 600px) {
   .container-fluid {
       background-size: cover;
-      height: 105vh; /* Full viewport height */
+      height: 105vh; 
   }
 
   .logo {
@@ -201,7 +201,7 @@ h6 {
 @media only screen and (min-width: 600px) and (max-width: 890px) {
   .container-fluid {
       background-size: cover;
-      height: 105vh; /* Full viewport height */
+      height: 105vh; 
   }
 
   input {

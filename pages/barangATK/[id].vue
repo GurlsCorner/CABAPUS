@@ -1,14 +1,16 @@
 <script setup>
-
 const supabase = useSupabaseClient()
 const route = useRoute()
 const barangID = Number(route.params.id)
 const categories = ref([])
+const satuan = ref([])
 const imgBarang = ref()
 const barangATK = ref({
     nama_barang: "",
+    spek: "",
     id_kategori: null,
     jumlah: "",
+    id_satuan: "",
     foto_barang: null
 })
 
@@ -22,10 +24,19 @@ const getCategory = async () => {
     if (data) categories.value = data
 }
 
+const getSatuan = async () => {
+    const { data, error } = await supabase.from('satuan').select('*')
+    if (error) {
+        console.error("Error fetching satuan:", error)
+        return
+    }
+    if (data) satuan.value = data
+}
+
 const getBarangId = async () => {
     let { data, error } = await supabase
         .from('barang')
-        .select(`*, kategori (*)`)
+        .select(`*, kategori (*), satuan(*)`)
         .eq('id', barangID)
         .single()
 
@@ -93,11 +104,12 @@ async function updateBarangATK() {
         const { data: { publicUrl: url } } = supabase.storage.from('fotoBarang').getPublicUrl(newFoto);
 
 
-        // Update database barang
         const { error } = await supabase.from('barang').update({
             nama_barang: barangATK.value.nama_barang,
+            spek: barangATK.value.spek,
             id_kategori: barangATK.value.id_kategori,
             jumlah: barangATK.value.jumlah,
+            id_satuan: barangATK.value.id_satuan,
             foto_barang: url
         }).eq('id', barangID);
 
@@ -122,13 +134,10 @@ watch(() => route.params.id, (newID) => {
 }, { immediate: true }) // Agar dijalankan langsung saat halaman dimuat
 
 
-function cekKategori() {
-    console.log("🔄 ID Kategori setelah dipilih:", barangATK.id_kategori);
-}
-
 onMounted(() => {
     getBarangId()
     getCategory()
+    getSatuan()
 })
 
 
@@ -152,8 +161,8 @@ definePageMeta({
                             <form @submit.prevent="updateBarangATK" class="m-5">
                                 <div class="mb-3">
                                     <img :src="barangATK.foto_barang" alt="img-barang" class="w-50"> <br>
-                                    <label class="form-label">Upload Gambar Disini</label>
-                                    <input :disabled="!barangATK.id_kategori" @change="imgPicked" type="file"
+                                     <p class="text-secondary"><i>Update gambar sedang dalam proses pengembangan</i></p>
+                                    <input disabled @change="imgPicked" type="file"
                                         accept="image/*">
                                 </div>
                                 <div class="mb-3">
@@ -161,12 +170,26 @@ definePageMeta({
                                     <input v-model="barangATK.nama_barang" type="text" class="form-control">
                                 </div>
                                 <div class="mb-3">
+                                    <label class="form-label">Spek</label>
+                                    <input v-model="barangATK.spek" type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Kategori</label>
-                                    <select v-model="barangATK.id_kategori" @change="cekKategori"
+                                    <select v-model="barangATK.id_kategori"
                                         class="form-control form-select" id="keperluan">
                                         <option v-for="category in categories" :key="category.id_kategori"
                                             :value="category.id_kategori">
                                             {{ category.nama }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Satuan</label>
+                                    <select v-model="barangATK.id_satuan"
+                                        class="form-control form-select" id="keperluan">
+                                        <option v-for="satu in satuan" :key="satu.id_satuan"
+                                            :value="satu.id_satuan">
+                                            {{ satu.nama }}
                                         </option>
                                     </select>
                                 </div>
@@ -191,6 +214,7 @@ definePageMeta({
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 
 h3,
+p,
 label,
 input,
 .btn {

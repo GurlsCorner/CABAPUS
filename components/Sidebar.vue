@@ -20,7 +20,7 @@
             <div class="card m-2 mt-4 rounded-4">
               <nuxt-link to="/barangART" class="no-underline">
               <div class="d-flex m-3">
-                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-scissors"></i></span>  
+                <span class="span-first text-center rounded-3 mt-1"><i class="bi bi-cup fs-2"></i></span>  
                   <h6 class="mt-3">Barang ART</h6>
                 </div>
               </nuxt-link>        
@@ -103,7 +103,7 @@ h6 {
 @media only screen and (max-width: 600px) {
   .container-fluid {
     top: 6rem;
-    width: 6rem; /* Pastikan sidebar punya lebar tetap */
+    width: 6rem; 
     flex-shrink: 0; /* Mencegah sidebar mengecil */
   }
 
@@ -139,8 +139,8 @@ h6 {
 @media only screen and (min-width: 600px) and (max-width: 890px) {
   .container-fluid {
     top: 6rem;
-    width: 6rem; /* Pastikan sidebar punya lebar tetap */
-    flex-shrink: 0; /* Mencegah sidebar mengecil */
+    width: 6rem; 
+    flex-shrink: 0; 
   }
 
   .menu {

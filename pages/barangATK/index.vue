@@ -2,13 +2,13 @@
 const supabase = useSupabaseClient()
 const barangATK = ref([])
 const keyword = ref('')
-const barang = ref()
 const selectBarang = ref({})
 const categories = ref([])
+const satuan = ref([])
 const router = useRouter()
-const limit = 10 // Jumlah data per batch
-const offset = ref(0) // Offset awal
-const hasMore = ref(true) // Cek apakah masih ada data
+const limit = 10 
+const offset = ref(0) 
+const hasMore = ref(true)
 const isPrinting = false
 
 
@@ -23,10 +23,10 @@ function toggleDelete(barang) {
 const getBarang = async () => {
     const { data, error } = await supabase
         .from('barang')
-        .select(`*, kategori(*)`)
+        .select(`*, kategori(*), satuan(*)`)
         .eq('id_kategori', 1)
         .order("created_at", { ascending: false })
-        .range(offset.value, offset.value + limit - 1) // Ambil data sesuai offset
+        .range(offset.value, offset.value + limit - 1)
 
     if (error) {
         console.log(error)
@@ -34,47 +34,22 @@ const getBarang = async () => {
     }
 
     if (data.length < limit) {
-        hasMore.value = false // Jika data kurang dari limit, berarti sudah habis
+        hasMore.value = false
     }
 
-    barangATK.value.push(...data) // Tambahkan data ke daftar
-    offset.value += limit // Geser offset untuk batch berikutnya
+    barangATK.value.push(...data)
+    offset.value += limit
 
 }
-
-
-// const { data: barangs, refresh } = useLazyAsyncData('barangs', async () => {
-//     const { data, error } = await supabase
-//         .from('barang')
-//         .select(`*, kategori(*)`)
-//         .order("created_at", { ascending: false })
-
-//     if (error) throw error
-//         return (data)
-// })
-
-// const getBarang = async () => {
-//   const { data, error } = await supabase.from('barang').select(`*, kategori(*)`)
-//   .ilike('nama_barang', `%${keyword.value}%`).order("created_at", { ascending: false }).eq('id_kategori', 1);
-
-//   if (data) {
-//     barangATK.value = data
-//     }
-// }
-
-// const { data: barangATK, refresh } = useLazyAsyncData('barangATK', async () => {
-//     const { data, error } = await supabase
-//     .from('barang')
-//     .select(`*, kategori(*)`)
-//     .order("created_at", { ascending: false })
-//     .eq('id_kategori', 1);
-//     if (error) throw error
-//     return (data)
-// })
 
 const getCategory = async () => {
     const { data, error } = await supabase.from('kategori').select('*')
     if (data) categories.value = data
+}
+
+const getSatuan = async () => {
+    const { data, error } = await supabase.from('satuan').select('*')
+    if (data) satuan.value = data
 }
 
 const barangFiltered = computed(() => {
@@ -85,13 +60,6 @@ const barangFiltered = computed(() => {
         )
     })
 })
-
-// const deleteBarang = async (id) => {
-//     const { error } = await supabase.from('barang').delete().eq('id', id)
-//     if (error) throw error
-//     else
-//         refresh()
-// }
 
 
 const deleteBarang = async (id) => {
@@ -122,8 +90,18 @@ const printTable = () => {
   const printContents = document.getElementById('printableArea').innerHTML; // Ambil isi tabel
   const formattedDate = getFormattedTodayDate();
   const tandaTangan = `
-    <h6 class="text-end mt-5">Tasikmalaya, ${formattedDate}</h6>
-    <h6 class="text-end mt-5">............................................</h6>
+    <div class="d-flex mt-5">
+        <div class="one">
+            <h6 class="text-start">Penyimpanan Barang</h6>
+            <h6 class="mt-5">............................................</h6>
+        </div>
+        <div class="two ms-auto text-start">
+            <h6>Tasikmalaya, ${formattedDate}</h6>
+            <h6>Mengetahui</h6>
+            <h6>Kepala UPA Perpustakaan</h6>
+            <h6 class="mt-5">............................................</h6>
+        </div>
+    </div>
   `;
   const originalContents = document.body.innerHTML;
 
@@ -145,7 +123,7 @@ const printTable = () => {
       </head>
       <body>
         <header>
-            <h4 class="text-center mt-2 mb-4">Daftar Barang ATK</h4>
+            <h4 class="text-center mt-2 mb-4">BARANG ATK <br> UPA PERPUSTAKAAN UNIVERSITAS SILIWANGI</h4>
         </header>
         ${printContents}
         ${tandaTangan}
@@ -155,12 +133,10 @@ const printTable = () => {
 
 
 
-    // isPrinting = true;
     window.print();
     document.body.innerHTML = originalContents; 
 
     window.location.reload();
-    // isPrinting = false;
 };
 
 
@@ -169,6 +145,7 @@ const printTable = () => {
 onMounted(() => {
     getBarang()
     getCategory()
+    getSatuan()
     // refresh()
 })
 
@@ -209,33 +186,16 @@ definePageMeta({
                         <button type="button" class="btn btn-print rounded-5"  @click="printTable">Print</button>
                     </div>
                 </div>
-
-                <!-- <div class="row mt-5 p-0 title-search">
-                    <div class="col-md-6">
-                        <h3 class="mt-4">Barang ATK</h3>
-                    </div>
-                    <div class="col-md-6 mt-4 d-flex justify-content-end">
-                        <nuxt-link to="/barangATK/add">
-                            <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ATK</button>
-                        </nuxt-link>
-                    </div>
-                </div>                
-                <div class="filter d-flex justify-content-end mt-5">
-                    <form @submit.prevent="getBarang" class="d-flex gap-4">
-                        <input v-model="keyword" type="text" placeholder="Searh..." class="search rounded-5">
-                        <input v-model="keyword" type="date" class="date rounded-5">
-                    </form>
-                </div> -->
                 <div class="card card-riwayat mt-4 shadow">
                     <div id="printableArea" class="table-responsive text-center mt-4 mb-5">
-                        <table class="mb-4">
+                        <table class="">
                             <thead class="text-center">
                                 <tr>
                                     <th>No</th>
                                     <th>Foto Barang</th>
                                     <th>Tanggal</th>
                                     <th>Nama Barang</th>
-                                    <th>Jenis Barang</th>
+                                    <th>Spek</th>
                                     <th>Jumlah</th>
                                     <th v-if="!isPrinting" class="th-edit">Edit</th>
                                     <th v-if="!isPrinting" class="th-delete">Hapus</th>
@@ -247,8 +207,8 @@ definePageMeta({
                                     <td><img :src="barang.foto_barang" class="rounded-3"></td>
                                     <td>{{ barang.created_at }}</td>
                                     <td>{{ barang.nama_barang }}</td>
-                                    <td>{{ barang.kategori?.nama }}</td>
-                                    <td>{{ barang.jumlah }}</td>
+                                    <td>{{ barang.spek }}</td>
+                                    <td>{{ barang.jumlah }} {{ barang.satuan?.nama }}</td>
                                     <td v-if="!isPrinting" class="edit">
                                             <i class="bi bi-pencil-square" @click="goToEdit(barang.id)"></i>
                                     </td>
@@ -259,7 +219,7 @@ definePageMeta({
                         </table>
                     </div>
                     <div class="text-center">
-                        <button class="btn" v-if="hasMore" @click="getBarang"> Load More </button>
+                        <button class="btn mb-3 rounded-5" v-if="hasMore" @click="getBarang"> Load More </button>
                     </div>
                 </div>
             </div>
@@ -291,11 +251,6 @@ definePageMeta({
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-/* .container-fluid, .page, .content {
-    margin: 0;
-    padding: 0;
-} */
 
 h2, h3, h5, h6, th, td, input, .btn-print {
     font-family: "Josefin Sans", serif;
@@ -337,7 +292,7 @@ th {
     width: 15rem;
     color: #fff;
     background-color: #9AA6B2;
-    border: 0.5px solid #000;
+    border: none;
 }
 
 table {
@@ -361,7 +316,7 @@ th, td {
 
 .btn-print {
     color: #fff;
-    width: 9rem;
+    width: 8rem;
     height: 2.5rem;
     background-color: #9AA6B2;
 }
@@ -492,6 +447,7 @@ th, td {
     }
 
     .filter .d-flex {
+        padding: 0 !important;
         gap: 0.5rem !important;
     }
 
@@ -503,6 +459,13 @@ th, td {
 
     .date {
         font-size: 0.9rem !important; 
+    }
+
+    .btn-print {
+        width: 8rem;
+        height: 2rem;
+        padding-top: 0.2rem;
+        padding: 0 !important;
     }
 
 }
@@ -553,7 +516,7 @@ th, td {
                                     <td>10 / 02 / 2025</td>
                                     <td>Indah</td>
                                     <td>Tisu</td>
-                                    <td>ART</td>
+                                    <td>ATK</td>
                                     <td>1</td>
                                     <td class="edit"><i class="bi bi-pencil-square"></i></td>
                                     <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
@@ -729,7 +692,7 @@ th {
                                         <td>10 / 02 / 2025</td>
                                         <td>Indah</td>
                                         <td>Tisu</td>
-                                        <td>ART</td>
+                                        <td>ATK</td>
                                         <td>1</td>
                                     </tr>
                                 </tbody>

@@ -2,13 +2,13 @@
 const supabase = useSupabaseClient()
 const barangART = ref([])
 const keyword = ref('')
-const barang = ref()
 const selectBarang = ref({})
 const categories = ref([])
+const satuan = ref([])
 const router = useRouter()
-const limit = 10 // Jumlah data per batch
-const offset = ref(0) // Offset awal
-const hasMore = ref(true) // Cek apakah masih ada data
+const limit = 10 
+const offset = ref(0) 
+const hasMore = ref(true)
 const isPrinting = false
 
 
@@ -23,10 +23,10 @@ function toggleDelete(barang) {
 const getBarang = async () => {
     const { data, error } = await supabase
         .from('barang')
-        .select(`*, kategori(*)`)
+        .select(`*, kategori(*), satuan(*)`)
         .eq('id_kategori', 2)
         .order("created_at", { ascending: false })
-        .range(offset.value, offset.value + limit - 1) // Ambil data sesuai offset
+        .range(offset.value, offset.value + limit - 1)
 
     if (error) {
         console.log(error)
@@ -34,47 +34,21 @@ const getBarang = async () => {
     }
 
     if (data.length < limit) {
-        hasMore.value = false // Jika data kurang dari limit, berarti sudah habis
+        hasMore.value = false
     }
 
-    barangART.value.push(...data) // Tambahkan data ke daftar
-    offset.value += limit // Geser offset untuk batch berikutnya
-
+    barangART.value.push(...data) 
+    offset.value += limit 
 }
-
-
-// const { data: barangs, refresh } = useLazyAsyncData('barangs', async () => {
-//     const { data, error } = await supabase
-//         .from('barang')
-//         .select(`*, kategori(*)`)
-//         .order("created_at", { ascending: false })
-
-//     if (error) throw error
-//         return (data)
-// })
-
-// const getBarang = async () => {
-//   const { data, error } = await supabase.from('barang').select(`*, kategori(*)`)
-//   .ilike('nama_barang', `%${keyword.value}%`).order("created_at", { ascending: false }).eq('id_kategori', 1);
-
-//   if (data) {
-//     barangART.value = data
-//     }
-// }
-
-// const { data: barangART, refresh } = useLazyAsyncData('barangART', async () => {
-//     const { data, error } = await supabase
-//     .from('barang')
-//     .select(`*, kategori(*)`)
-//     .order("created_at", { ascending: false })
-//     .eq('id_kategori', 1);
-//     if (error) throw error
-//     return (data)
-// })
 
 const getCategory = async () => {
     const { data, error } = await supabase.from('kategori').select('*')
     if (data) categories.value = data
+}
+
+const getSatuan = async () => {
+    const { data, error } = await supabase.from('satuan').select('*')
+    if (data) satuan.value = data
 }
 
 const barangFiltered = computed(() => {
@@ -86,14 +60,6 @@ const barangFiltered = computed(() => {
     })
 })
 
-// const deleteBarang = async (id) => {
-//     const { error } = await supabase.from('barang').delete().eq('id', id)
-//     if (error) throw error
-//     else
-//         refresh()
-// }
-
-
 const deleteBarang = async (id) => {
     const { error } = await supabase.from('barang').delete().eq('id', id)
     if (error) {
@@ -101,11 +67,10 @@ const deleteBarang = async (id) => {
         return
     }
 
-    // Reset daftar barang & ambil ulang data
     barangART.value = []
     offset.value = 0
     hasMore.value = true
-    await getBarang() // Muat ulang data dari awal
+    await getBarang()
 }
 
 const getFormattedTodayDate = () => {
@@ -118,12 +83,21 @@ const getFormattedTodayDate = () => {
 
 
 const printTable = () => {
-//   const navbar = document.getElementById('navbar').outerHTML; // Ambil isi navbar
   const printContents = document.getElementById('printableArea').innerHTML; // Ambil isi tabel
   const formattedDate = getFormattedTodayDate();
   const tandaTangan = `
-    <h6 class="text-end mt-5">Tasikmalaya, ${formattedDate}</h6>
-    <h6 class="text-end mt-5">............................................</h6>
+    <div class="d-flex mt-5">
+        <div class="one">
+            <h6 class="text-start">Penyimpanan Barang</h6>
+            <h6 class="mt-5">............................................</h6>
+        </div>
+        <div class="two ms-auto text-start">
+            <h6>Tasikmalaya, ${formattedDate}</h6>
+            <h6>Mengetahui</h6>
+            <h6>Kepala UPA Perpustakaan</h6>
+            <h6 class="mt-5">............................................</h6>
+        </div>
+    </div>
   `;
   const originalContents = document.body.innerHTML;
 
@@ -155,21 +129,16 @@ const printTable = () => {
 
 
 
-    // isPrinting = true;
     window.print();
     document.body.innerHTML = originalContents; 
 
     window.location.reload();
-    // isPrinting = false;
 };
-
-
-
 
 onMounted(() => {
     getBarang()
     getCategory()
-    // refresh()
+    getSatuan()
 })
 
 
@@ -188,11 +157,11 @@ definePageMeta({
             <div class="content mb-5">
                 <div class="row mt-5 p-0 title-search">
                     <div class="col-6 col-md-6">
-                        <h3 class="mt-4">Barang ATK</h3>
+                        <h3 class="mt-4">Barang ART</h3>
                     </div>
                     <div class="col-6 col-md-6 mt-4 d-flex justify-content-end">
                         <nuxt-link to="/barangART/add">
-                            <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ATK</button>
+                            <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ART</button>
                         </nuxt-link>
                     </div>
                 </div>
@@ -209,33 +178,16 @@ definePageMeta({
                         <button type="button" class="btn btn-print rounded-5"  @click="printTable">Print</button>
                     </div>
                 </div>
-
-                <!-- <div class="row mt-5 p-0 title-search">
-                    <div class="col-md-6">
-                        <h3 class="mt-4">Barang ATK</h3>
-                    </div>
-                    <div class="col-md-6 mt-4 d-flex justify-content-end">
-                        <nuxt-link to="/barangART/add">
-                            <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ATK</button>
-                        </nuxt-link>
-                    </div>
-                </div>                
-                <div class="filter d-flex justify-content-end mt-5">
-                    <form @submit.prevent="getBarang" class="d-flex gap-4">
-                        <input v-model="keyword" type="text" placeholder="Searh..." class="search rounded-5">
-                        <input v-model="keyword" type="date" class="date rounded-5">
-                    </form>
-                </div> -->
                 <div class="card card-riwayat mt-4 shadow">
                     <div id="printableArea" class="table-responsive text-center mt-4 mb-5">
-                        <table class="mb-4">
+                        <table class="">
                             <thead class="text-center">
                                 <tr>
                                     <th>No</th>
                                     <th>Foto Barang</th>
                                     <th>Tanggal</th>
                                     <th>Nama Barang</th>
-                                    <th>Jenis Barang</th>
+                                    <th>Spek</th>
                                     <th>Jumlah</th>
                                     <th v-if="!isPrinting" class="th-edit">Edit</th>
                                     <th v-if="!isPrinting" class="th-delete">Hapus</th>
@@ -247,8 +199,8 @@ definePageMeta({
                                     <td><img :src="barang.foto_barang" class="rounded-3"></td>
                                     <td>{{ barang.created_at }}</td>
                                     <td>{{ barang.nama_barang }}</td>
-                                    <td>{{ barang.kategori?.nama }}</td>
-                                    <td>{{ barang.jumlah }}</td>
+                                    <td>{{ barang.spek }}</td>
+                                    <td>{{ barang.jumlah }} {{ barang.satuan?.nama }}</td>
                                     <td v-if="!isPrinting" class="edit">
                                             <i class="bi bi-pencil-square" @click="goToEdit(barang.id)"></i>
                                     </td>
@@ -259,7 +211,7 @@ definePageMeta({
                         </table>
                     </div>
                     <div class="text-center">
-                        <button class="btn" v-if="hasMore" @click="getBarang"> Load More </button>
+                        <button class="btn mb-3 rounded-5" v-if="hasMore" @click="getBarang"> Load More </button>
                     </div>
                 </div>
             </div>
@@ -291,11 +243,6 @@ definePageMeta({
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-/* .container-fluid, .page, .content {
-    margin: 0;
-    padding: 0;
-} */
 
 h2, h3, h5, h6, th, td, input, .btn-print {
     font-family: "Josefin Sans", serif;
@@ -337,7 +284,7 @@ th {
     width: 15rem;
     color: #fff;
     background-color: #9AA6B2;
-    border: 0.5px solid #000;
+    border: none;
 }
 
 table {
@@ -361,7 +308,7 @@ th, td {
 
 .btn-print {
     color: #fff;
-    width: 9rem;
+    width: 8rem;
     height: 2.5rem;
     background-color: #9AA6B2;
 }
@@ -492,6 +439,7 @@ th, td {
     }
 
     .filter .d-flex {
+        padding: 0 !important;
         gap: 0.5rem !important;
     }
 
@@ -505,475 +453,13 @@ th, td {
         font-size: 0.9rem !important; 
     }
 
+    .btn-print {
+        width: 8rem;
+        height: 2rem;
+        padding-top: 0.2rem;
+        padding: 0 !important;
+    }
+
 }
 
 </style>
-
-
-
-<!-- <template>
-    <div class="container-fluid">
-        <div class="page d-flex">
-            <Sidebar />
-            <div class="content mb-5">
-                <div class="row mt-5">
-                    <div class="col-md-6 p-0">
-                        <h3 class="mt-4">Barang ATK</h3>
-                    </div>
-                    <div class="col-md-6 d-flex justify-content-end">
-                        <div class="filter mt-3">
-                            <form class="d-flex gap-4">
-                                <input type="text" placeholder="Searh..." class="search rounded-5">
-                                <input type="date" class="date rounded-5">
-                                <nuxt-link to="/barangART/add">
-                                    <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ATK</button>
-                                </nuxt-link>
-                            </form>
-                        </div>
-                    </div>
-                </div>                
-                <div class="card card-riwayat mt-4 shadow">
-                    <div class="table-responsive text-center mt-4">
-                        <table class="mb-4">
-                            <thead class="text-center">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Pengambil</th>
-                                    <th>Nama Barang</th>
-                                    <th>Jenis Barang</th>
-                                    <th>Jumlah</th>
-                                    <th>Edit</th>
-                                    <th>Hapus</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-center">
-                                <tr>
-                                    <td>1</td>
-                                    <td>10 / 02 / 2025</td>
-                                    <td>Indah</td>
-                                    <td>Tisu</td>
-                                    <td>ART</td>
-                                    <td>1</td>
-                                    <td class="edit"><i class="bi bi-pencil-square"></i></td>
-                                    <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
-                                </tr>
-                            </tbody>
-                            <tbody class="text-center">
-                                <tr>
-                                    <td>2</td>
-                                    <td>10 / 02 / 2025</td>
-                                    <td>Fani</td>
-                                    <td>Pulpen</td>
-                                    <td>ATK</td>
-                                    <td>1</td>
-                                    <td class="edit"><i class="bi bi-pencil-square"></i></td>
-                                    <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h2, h3, h6, th, td, input {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-    margin-top: 4rem;
-}
-
-.card-riwayat {
-    width: 90%;
-    margin: auto;
-}
-
-table {
-    width: 95%;
-    margin: auto;
-}
-
-th {
-    background-color: #BCCCDC;
-}
-
-.search {
-    width: 15rem;
-    height: 2.5rem;
-}
-
-.date {
-    width: 13rem;
-    height: 2.5rem;
-    color: #fff;
-    background-color: #9AA6B2;
-}
-
-.content {
-    margin-left: 20rem;
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-.btn {
-    width: 15rem;
-    color: #fff;
-    background-color: #9AA6B2;
-    border: 0.5px solid #000;
-}
-
-@media only screen and (max-width: 600px) {
-    h3 {
-        margin-left: 1rem;
-        margin-top: 5rem;
-        font-size: 1rem;
-    }
-
-    .content {
-        margin-left: 6rem;
-        margin-top: 3rem;
-    }
-
-    table {
-        margin: 0 1rem;
-    }
-
-    th, td {
-        font-size: 0.6rem;
-    }
-
-    .search {
-        width: 8rem;
-        height: 1.3rem;
-    }
-
-    .date, .btn {
-        width: 5rem;
-        height: 1.3rem;
-    }
-
-    .btn i {
-        font-size: 0.7rem !important;
-    }
-
-    .btn {
-        font-size: 0.5rem;
-        padding-top: 0;
-    }
-
-    .filter .d-flex {
-        gap: 0.5rem !important;
-    }
-
-    .search::placeholder {
-        font-size: 0.7rem !important; 
-        color: #888;
-        padding-left: 0.5rem !important; 
-    }
-
-    .date {
-        font-size: 0.7rem !important; 
-    }
-
-    table i {
-        font-size: 0.5rem;
-    }
-
-}
-
-</style> -->
-
-
-<!-- <template>
-    <div class="container-fluid">
-        <div class="dashboard d-flex">
-            <Sidebar />
-            <div class="content mb-5">
-                <div class="row mt-5">
-                    <div class="col-md-6">
-                        <h3 class="mt-4">Riwayat Peminjaman</h3>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="filter mt-3">
-                            <form class="d-flex gap-4">
-                                <input type="text" placeholder="Searh..." class="search rounded-5">
-                                <input type="date" class="date rounded-5">
-                            </form>
-                        </div>
-                    </div>
-                </div>                  
-                <div class="card card-riwayat mt-5 shadow">
-                        <div class="table-responsive text-center mt-4">
-                            <table class="mb-4">
-                                <thead class="text-center">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Tanggal</th>
-                                        <th>Nama Pengambil</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jenis Barang</th>
-                                        <th>Jumlah</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Indah</td>
-                                        <td>Tisu</td>
-                                        <td>ART</td>
-                                        <td>1</td>
-                                    </tr>
-                                </tbody>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>2</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Fani</td>
-                                        <td>Pulpen</td>
-                                        <td>ATK</td>
-                                        <td>1</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h2, h3, h6, th, td {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-    margin-top: 4rem;
-}
-
-.search {
-    width: 15rem;
-    height: 2.5rem;
-}
-
-.date {
-    width: 13rem;
-    height: 2.5rem;
-    color: #fff;
-    background-color: #9AA6B2;
-}
-
-.filter {
-    margin: end;
-}
-
-.card-riwayat {
-    width: 90%;
-    margin: auto;
-}
-
-table {
-    width: 95%;
-    margin: auto;
-}
-
-th {
-    background-color: #BCCCDC;
-}
-
-.content {
-    margin-left: 20rem;
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-@media only screen and (max-width: 600px) {
-    h3 {
-        margin-left: 2rem;
-        margin-top: 2rem !important;
-    }
-
-    .content {
-        margin-left: 6rem;
-        margin-top: 3rem;
-    }
-
-    table {
-        margin: 0 1rem;
-    }
-
-    .search {
-        width: 7rem;
-        height: 1.8rem;
-    }
-
-    .date {
-        width: 5rem;
-        height: 1.8rem;
-    }
-
-    .filter {
-        margin: end;
-    }
-}
-
-</style> -->
-
-<!-- <template>
-    <div class="container-fluid mb-5">
-        <div class="page d-flex">
-            <Sidebar />
-            <div class="content mb-5">
-                <div class="row mt-5">
-                    <div class="col-5">
-                        <h3 class="mt-4">Barang ATK</h3>
-                    </div>
-                    <div class="col-7">
-                        <div class="filter mt-3">
-                            <form class="d-flex gap-4">
-                                <input type="text" placeholder="Searh..." class="search shadow rounded-5">
-                                <input type="date" class="date shadow rounded-5">
-                                <button class="btn shadow rounded-4"><i class="bi bi-plus-circle fs-6"></i> Barang ATK</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>                
-                <div class="card card-barang mt-5 shadow">
-                    <div class="text-center m-4">
-                        <table class="mb-3 mt-3">
-                                <thead class="text-center">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Tanggal Penambahan</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                        <th>Sisa</th>
-                                        <th>Edit</th>
-                                        <th>Hapus</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Pulpen</td>
-                                        <td>1</td>
-                                        <td>1</td>
-                                        <td class="edit"><i class="bi bi-pencil-square"></i></td>
-                                        <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
-                                    </tr>
-                                </tbody>
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td>2</td>
-                                        <td>10 / 02 / 2025</td>
-                                        <td>Kertas HVS</td>
-                                        <td>1</td>
-                                        <td>1</td>
-                                        <td class="edit"><i class="bi bi-pencil-square"></i></td>
-                                        <td class="delete"><i class="bi bi-trash3 text-danger"></i></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template> 
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-
-h2, h3, h6, th, td, .btn {
-    font-family: "Josefin Sans", serif;
-}
-
-h3 {
-    margin-left: 2rem;
-}
-
-.arrow {
-    color: green;
-}
-
-span {
-    width: 5rem;
-    height: 2rem;
-    border: none;
-    background-color: #EFFFE4;
-}
-
-.card-barang {
-    width: 90%;
-    margin: auto;
-}
-
-table {
-    width: 95%;
-    margin: auto;
-}
-
-.span-first {
-    background-color: #ffff !important;
-    border: 0.1px solid grey;
-    height: 3.5rem;
-}
-
-.span-first i {
-    color: grey;
-}
-
-th {
-    background-color: #BCCCDC;
-}
-
-.search {
-    width: 15rem;
-    height: 2.5rem;
-    border: 0.5px solid #000;
-}
-
-.date {
-    width: 13rem;
-    height: 2.5rem;
-    color: #fff;
-    background-color: #9AA6B2;
-    border: 0.5px solid #000;
-}
-
-.filter {
-    margin: end;
-    margin-right: 50px;
-}
-
-.btn {
-    width: 15rem;
-    color: #fff;
-    background-color: #9AA6B2;
-    border: 0.5px solid #000;
-}
-
-.content {
-    margin-left: 20rem; /* Offset the main content to the right of the sidebar */
-    flex-grow: 1;
-    margin-top: 5rem;
-}
-
-.edit, .delete {
-    width: 4rem;
-}
-
-</style> -->
