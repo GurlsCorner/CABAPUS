@@ -55,13 +55,15 @@ const printTable = () => {
   const tandaTangan = `
     <div class="d-flex mt-5">
         <div class="one">
-            <h6 class="text-start">Penyimpanan Barang</h6>
+            <h6 class="text-start mt-5">Pengelola Barang Persediaan</h6>
+            <br><br>
             <h6 class="mt-5">............................................</h6>
         </div>
         <div class="two ms-auto text-start">
             <h6>Tasikmalaya, ${formattedDate}</h6>
             <h6>Mengetahui</h6>
             <h6>Kepala UPA Perpustakaan</h6>
+            <br><br>
             <h6 class="mt-5">............................................</h6>
         </div>
     </div>

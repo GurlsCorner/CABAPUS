@@ -22,7 +22,7 @@ const setActive = (tab) => {
           <img src="../assets/img/logo.png" alt="logo" class="logo mt-2">
           <div class="text mt-2">
             <h4 class="fw-medium">CABAPUS</h4>
-            <p>Catatan Barang Perpustakaan Universitas Siliwangi</p>
+            <p>Catatan Barang Persediaan UPA Perpustakaan Universitas Siliwangi</p>
           </div>
       </nuxt-link>
       <div class="nav">

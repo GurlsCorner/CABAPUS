@@ -5,7 +5,7 @@
           <img src="../assets/img/logo.png" alt="logo" class="logo">
           <div class="text mt-2">
             <h4 class="fw-medium">CABAPUS</h4>
-            <p class="m-0">Catatan Barang Perpustakaan Universitas Siliwangi</p>
+            <p class="m-0">Catatan Barang Persediaan UPA Perpustakaan Universitas Siliwangi</p>
           </div>
       </nuxt-link>
       <div class="nav">
