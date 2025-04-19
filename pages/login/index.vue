@@ -22,6 +22,9 @@ definePageMeta ({
     layout: 'login'
 })
 
+useHead({ title: "Login - CABAPUS" })
+
+
 </script>
 
 <template>

@@ -149,6 +149,9 @@ definePageMeta({
     middleware: 'auth'
 })
 
+useHead({ title: "Barang ART - CABAPUS" })
+
+
 </script>
 
 

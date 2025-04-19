@@ -76,6 +76,9 @@ onMounted(() => {
     getCategory()
     getBarang()
 })
+
+useHead({ title: "CABAPUS" })
+
 </script>
 
 <template>

@@ -16,6 +16,9 @@ onMounted(() => {
     logout()
 })
 
+useHead({ title: "Logout - CABAPUS" })
+
+
 </script>
 
 

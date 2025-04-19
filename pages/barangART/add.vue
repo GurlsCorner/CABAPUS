@@ -68,6 +68,8 @@ definePageMeta({
     middleware: 'auth'
 })
 
+useHead({ title: "Tambah Barang ART - CABAPUS" })
+
 
 </script>
 

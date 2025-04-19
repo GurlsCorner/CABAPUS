@@ -116,6 +116,8 @@ definePageMeta({
     middleware: 'auth'
 })
 
+useHead({ title: "Riwayat Pengambilan Barang - CABAPUS" })
+
 
 </script>
 

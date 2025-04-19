@@ -81,6 +81,9 @@ definePageMeta({
     middleware: 'auth'
 })
 
+useHead({ title: "Dashboard - CABAPUS" })
+
+
 </script>
 
 <template>

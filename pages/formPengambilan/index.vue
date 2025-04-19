@@ -85,6 +85,9 @@ definePageMeta({
     middleware: 'auth'
 })
 
+useHead({ title: "Form Pengambilan Barang - CABAPUS" })
+
+
 
 </script>
 <template>
