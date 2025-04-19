@@ -53,7 +53,8 @@
   position: fixed;
   top: 7rem;
   left: 0;
-  overflow: hidden;        
+  overflow: hidden;   
+  background-color: #ffff;     
 }
 
 .menu {

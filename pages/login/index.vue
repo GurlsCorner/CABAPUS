@@ -25,11 +25,9 @@ definePageMeta ({
 </script>
 
 <template>
-    <div class="container-fluid p-0 mb-0">
+    <div class="container-fluid p-0 mb-0 top-0">
 
-      <div class="row">
-        <div class="col">
-          <div class="card card-back mt-3 rounded-4">
+          <div class="btn btn-back rounded-4 mt-3 pt-0">
             <nuxt-link to="/" class="no-underline">
             <div class="d-flex m-2">
               <span class="span-first text-center rounded-3"><i class="bi bi-arrow-bar-left fs-4"></i></span>
@@ -37,8 +35,6 @@ definePageMeta ({
               </div>
             </nuxt-link>
           </div>
-        </div>
-      </div>
 
         <div class="text-center p-5">
             <h2>Silahkan login, <b>Admin</b></h2>
@@ -112,10 +108,16 @@ img {
     width: 5rem;
 }
 
-.card-back {
+.col-back {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.btn-back {
   width: 7rem;
   height: 3rem;
   margin-left: 1rem;
+  padding-left: 0;
   background-color: #BCCCDC;
 }
 
